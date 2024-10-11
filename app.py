@@ -1,16 +1,47 @@
 import streamlit as st
 
-st.title("hej första gången streamlit")
-st.header("hej!")
-st.subheader("programmera med streamlit")
+# 1
+st.title("Min Dagbok.")
+st.text_area("Dokumentera i dagboksinlägget här.:")
+if st.button("Spara alla inlägg."):
 
-import streamlit as st
+    if "st.title":
+        st.success("Ditt inlägg har nu sparats.")
+    else:
+        st.error("Ditt inlägg har inte sparats än, skriv något.")
 
-if st.button("tryck här"):
-    st.write("skriv ett namn")
 
-import streamlit as st
+st.subheader("Tidigare Inlägg.")
+st.write("Inga tidigare inlägg finns tillgängliga.")
 
-namn = st.text_input("Vad heter du?")
-if namn:
-    st.write(f"Hej, {namn}! Välkommen till Streamlit.")
+
+# 2
+st.title("Humör för dagen.")
+st.selectbox('Humör',['Glad', 'Ledsen', 'Arg'])
+st.text_area('Förklara varför du känner dig så idag')
+if 'st.title':
+    st.success("Ditt inlägg har sparats.")
+else:
+    st.error("Ditt inlägg har inte sparats, skriv något.")
+
+
+# 3
+st.title('Olika taggar inom området.')
+st.multiselect('Taggar',['Skola', 'IT', 'Nätverk', 'Datorer', 'Hårdvara','Inlägg'])
+st.text_area('Förklara ytterligare varför dessa taggar tillhör inom ditt område.')
+if "st.title":
+    st.success("Ditt inlägg har sparats.")
+else:
+    st.error("Ditt inlägg har inte sparats, skriv något.")
+
+
+# 4
+st.title("Välj vecka, dag och tid.")
+st.selectbox('week_num',['41','42','43','44','45','46','47','48'])
+st.selectbox('day_num',['måndag','tisdag','onsdag','torsdag','fredag'])
+st.selectbox('time_num',['9:00-11:00','11:00-14:00'])
+st.text_area('Förklara med korta ord vad du gjorde varje vecka, inom dagen, vid dessa tider.')
+if 'st.title':
+    st.success("Ditt inlägg har sparats.")
+else:
+    st.error("Ditt inlägg har inte sparats, skriv något.")
