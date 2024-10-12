@@ -1,47 +1,66 @@
 import streamlit as st
+import boto3
+from boto3.dynamodb.conditions import Attr
 
-# 1
+AWS_REGION = "us-east-1"
+dynamodb = boto3.resource("dynamodb", region_name=AWS_REGION)
+table = dynamodb.Table("Spara")
+
+def SpararData(innehåll, titel, vecka_num, dag, tid_stampel):
+    table.put_item(
+        Item={
+            'innehåll': innehåll,
+            'titel': titel,
+            'vecka_num': vecka_num,
+            'dag': dag,
+            'tid_stampel': tid_stampel
+        }
+    )
+
+def SpararSeletions(vecka_num, dag, tid_stampel):
+    try:
+        response = table.scan(
+            FilterExpression=Attr('vecka_num').eq(vecka_num) &
+            Attr('dag').eq(dag) &
+            Attr('tid_stampel').eq(tid_stampel)
+        )
+        return response['Items']
+    except Exception as e:
+        st.error(f"Error scanning table: {e}")
+        return []
+
 st.title("Min Dagbok.")
-st.text_area("Dokumentera i dagboksinlägget här.:")
-if st.button("Spara alla inlägg."):
+titel = st.text_input("Lägg in en titel")
+innehåll = st.text_area("Dokumentera i dagboksinlägget här")
+spara = st.button("Spara inlägg.")
 
-    if "st.title":
-        st.success("Ditt inlägg har nu sparats.")
-    else:
-        st.error("Ditt inlägg har inte sparats än, skriv något.")
-
-
-st.subheader("Tidigare Inlägg.")
-st.write("Inga tidigare inlägg finns tillgängliga.")
-
-
-# 2
-st.title("Humör för dagen.")
-st.selectbox('Humör',['Glad', 'Ledsen', 'Arg'])
-st.text_area('Förklara varför du känner dig så idag')
-if 'st.title':
-    st.success("Ditt inlägg har sparats.")
-else:
-    st.error("Ditt inlägg har inte sparats, skriv något.")
-
-
-# 3
-st.title('Olika taggar inom området.')
-st.multiselect('Taggar',['Skola', 'IT', 'Nätverk', 'Datorer', 'Hårdvara','Inlägg'])
-st.text_area('Förklara ytterligare varför dessa taggar tillhör inom ditt område.')
-if "st.title":
-    st.success("Ditt inlägg har sparats.")
-else:
-    st.error("Ditt inlägg har inte sparats, skriv något.")
-
-
-# 4
 st.title("Välj vecka, dag och tid.")
-st.selectbox('week_num',['41','42','43','44','45','46','47','48'])
-st.selectbox('day_num',['måndag','tisdag','onsdag','torsdag','fredag'])
-st.selectbox('time_num',['9:00-11:00','11:00-14:00'])
-st.text_area('Förklara med korta ord vad du gjorde varje vecka, inom dagen, vid dessa tider.')
-if 'st.title':
-    st.success("Ditt inlägg har sparats.")
+
+vecka_num = st.selectbox('Vecka', ['41', '42', '43', '44', '45', '46', '47', '48'])
+dag = st.selectbox('Dag', ['måndag', 'tisdag', 'onsdag', 'torsdag', 'fredag'])
+tid_stampel = st.selectbox('Tid', ['9:00-11:00', '11:00-14:00'])
+
+items = SpararSeletions(vecka_num, dag, tid_stampel)
+
+if spara:
+    if not titel or not innehåll:
+        st.error("Lägg in en titel och skriv något.")
+    else:
+        SpararData(innehåll, titel, vecka_num, dag, tid_stampel)
+        st.success("Ditt inlägg har nu sparats.")
+
+if not items:
+    st.info("Inga sparade dokument hittades för denna vecka.")
+    
 else:
-    st.error("Ditt inlägg har inte sparats, skriv något.")
+    for item in items:
+        st.write(f"**Titel:** {item['titel']}")
+        st.write("------------------------------")
+        st.write(f"**Innehåll:** {item['innehåll']}")
+        st.write("------------------------------")
+        st.write(f"**Vecka:** {item['vecka_num']}")
+        st.write("------------------------------")
+        st.write(f"**Dag:** {item['dag']}")
+        st.write("------------------------------")
+        st.write(f"**Tid:** {item['tid_stampel']}")
+        st.write("------------------------------")
